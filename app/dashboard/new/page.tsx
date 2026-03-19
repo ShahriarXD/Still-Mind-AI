@@ -270,7 +270,7 @@ export default function NewInteractionPage() {
                   placeholder="Paste your raw notes here... e.g. 'Called Ahmed about invoice #2041, he said he needs 2 more weeks, mentioned cash flow issues...'"
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  className="min-h-[180px] resize-none"
+                  className="min-h-45 resize-none"
                 />
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-500">

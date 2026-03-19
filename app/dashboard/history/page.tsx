@@ -306,7 +306,7 @@ export default function HistoryPage() {
                               <Badge variant="secondary" className="text-xs">{interaction.type}</Badge>
                             </td>
                             <td className="px-4 py-3.5">
-                              <p className="text-sm text-slate-400 line-clamp-1 max-w-[260px]">{interaction.summary}</p>
+                              <p className="text-sm text-slate-400 line-clamp-1 max-w-65">{interaction.summary}</p>
                             </td>
                             <td className="px-4 py-3.5">
                               <Badge variant={cfg.variant}>

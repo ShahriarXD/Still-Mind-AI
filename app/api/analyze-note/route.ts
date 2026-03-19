@@ -98,8 +98,7 @@ function generateFollowUps(risk: RiskLevel, type: string): string[] {
 function generateDraftMessage(
   customerName: string,
   risk: RiskLevel,
-  type: string,
-  _note: string
+  type: string
 ): string {
   const firstName = customerName.split(" ")[0];
 
@@ -134,7 +133,7 @@ export async function POST(req: NextRequest) {
     const risk = detectRisk(note, type);
     const summary = generateSummary(customerName, note, type);
     const followUps = generateFollowUps(risk, type);
-    const draftMessage = generateDraftMessage(customerName, risk, type, note);
+    const draftMessage = generateDraftMessage(customerName, risk, type);
 
     const response: AnalyzeNoteResponse = {
       summary,

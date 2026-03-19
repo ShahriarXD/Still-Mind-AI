@@ -49,7 +49,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative w-full max-w-md animate-slide-up">
         {/* Logo */}

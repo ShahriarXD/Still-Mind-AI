@@ -64,15 +64,6 @@ export default function BillingPage() {
     });
   };
 
-  const handlePaymentFailure = (error: string) => {
-    setCheckoutOpen(false);
-    toast({
-      title: "Payment failed",
-      description: error,
-      variant: "destructive",
-    });
-  };
-
   return (
     <div>
       <TopBar title="Billing & Plans" subtitle="Upgrade to unlock more AI power" />

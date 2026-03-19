@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-500/4 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-100 bg-amber-500/4 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="relative w-full max-w-4xl animate-fade-in">
         <div className="grid md:grid-cols-2 gap-8 items-center">

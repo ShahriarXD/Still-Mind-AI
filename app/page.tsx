@@ -99,8 +99,8 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 px-6">
         {/* Background glows */}
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-48 left-1/4 w-[300px] h-[300px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 w-150 h-100 bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-48 left-1/4 w-75 h-75 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
         {/* 3D floating orbs */}
         <div className="absolute top-36 right-[8%] w-24 h-24 rounded-full bg-amber-500/8 border border-amber-500/15 blur-sm animate-orbit-3d pointer-events-none hidden lg:block" style={{ animationDelay: "0s" }} />
