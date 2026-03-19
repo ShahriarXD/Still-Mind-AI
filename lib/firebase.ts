@@ -3,6 +3,16 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import type { Analytics } from "firebase/analytics";
 
+const defaultFirebasePublicConfig = {
+  apiKey: "AIzaSyCcovDbWew5iwahusJ7B0v7yqkreh_h-RE",
+  authDomain: "simple-prac-72cd7.firebaseapp.com",
+  projectId: "simple-prac-72cd7",
+  storageBucket: "simple-prac-72cd7.firebasestorage.app",
+  messagingSenderId: "332299034074",
+  appId: "1:332299034074:web:aff23cfeb1c1c63c7bf4e3",
+  measurementId: "G-TTQBWHHCXK",
+};
+
 const firebasePublicEnv = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -14,12 +24,12 @@ const firebasePublicEnv = {
 };
 
 const requiredFirebasePublicEnv = {
-  apiKey: firebasePublicEnv.apiKey,
-  authDomain: firebasePublicEnv.authDomain,
-  projectId: firebasePublicEnv.projectId,
-  storageBucket: firebasePublicEnv.storageBucket,
-  messagingSenderId: firebasePublicEnv.messagingSenderId,
-  appId: firebasePublicEnv.appId,
+  apiKey: firebasePublicEnv.apiKey ?? defaultFirebasePublicConfig.apiKey,
+  authDomain: firebasePublicEnv.authDomain ?? defaultFirebasePublicConfig.authDomain,
+  projectId: firebasePublicEnv.projectId ?? defaultFirebasePublicConfig.projectId,
+  storageBucket: firebasePublicEnv.storageBucket ?? defaultFirebasePublicConfig.storageBucket,
+  messagingSenderId: firebasePublicEnv.messagingSenderId ?? defaultFirebasePublicConfig.messagingSenderId,
+  appId: firebasePublicEnv.appId ?? defaultFirebasePublicConfig.appId,
 };
 
 export const missingRequiredFirebaseKeys = Object.entries(requiredFirebasePublicEnv)
@@ -32,16 +42,16 @@ if (!isFirebaseConfigured && typeof window !== "undefined") {
   console.error("Missing Firebase env vars:", missingRequiredFirebaseKeys);
 }
 
-// Fallback values prevent build errors when .env.local is not present.
-// The app will not be functional without real Firebase credentials.
+// Public Firebase config values can safely be in client bundles.
+// Env vars override defaults in each deployment.
 const firebaseConfig = {
-  apiKey: firebasePublicEnv.apiKey ?? "build-placeholder",
-  authDomain: firebasePublicEnv.authDomain ?? "build-placeholder.firebaseapp.com",
-  projectId: firebasePublicEnv.projectId ?? "build-placeholder",
-  storageBucket: firebasePublicEnv.storageBucket ?? "build-placeholder.appspot.com",
-  messagingSenderId: firebasePublicEnv.messagingSenderId ?? "000000000000",
-  appId: firebasePublicEnv.appId ?? "1:000000000000:web:build-placeholder",
-  measurementId: firebasePublicEnv.measurementId,
+  apiKey: requiredFirebasePublicEnv.apiKey,
+  authDomain: requiredFirebasePublicEnv.authDomain,
+  projectId: requiredFirebasePublicEnv.projectId,
+  storageBucket: requiredFirebasePublicEnv.storageBucket,
+  messagingSenderId: requiredFirebasePublicEnv.messagingSenderId,
+  appId: requiredFirebasePublicEnv.appId,
+  measurementId: firebasePublicEnv.measurementId ?? defaultFirebasePublicConfig.measurementId,
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
