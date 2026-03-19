@@ -155,6 +155,7 @@ function InteractionDetailDialog({
 }
 
 export default function HistoryPage() {
+  const { toast } = useToast();
   const { user } = useAuth();
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -169,21 +170,33 @@ export default function HistoryPage() {
       collection(db, "users", user.uid, "interactions"),
       orderBy("createdAt", "desc")
     );
-    const unsub = onSnapshot(q, (snap) => {
-      const docs = snap.docs.map((d) => {
-        const data = d.data();
-        const ts = data.createdAt as Timestamp | null;
-        return {
-          id: d.id,
-          ...data,
-          createdAt: ts ? ts.toDate().toISOString() : new Date().toISOString(),
-        } as Interaction;
-      });
-      setInteractions(docs);
-      setLoadingData(false);
-    });
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const docs = snap.docs.map((d) => {
+          const data = d.data();
+          const ts = data.createdAt as Timestamp | null;
+          return {
+            id: d.id,
+            ...data,
+            createdAt: ts ? ts.toDate().toISOString() : new Date().toISOString(),
+          } as Interaction;
+        });
+        setInteractions(docs);
+        setLoadingData(false);
+      },
+      (err) => {
+        console.error("History listener failed:", err);
+        setLoadingData(false);
+        toast({
+          title: "Could not load history",
+          description: "Firestore requests are blocked by your browser (ad blocker/privacy shield). Disable it for this site and refresh.",
+          variant: "destructive",
+        });
+      }
+    );
     return unsub;
-  }, [user]);
+  }, [user, toast]);
 
   const filtered = interactions.filter((i) => {
     const matchesSearch =

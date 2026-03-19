@@ -189,9 +189,20 @@ export default function NewInteractionPage() {
       }, 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not save interaction.";
+      const lowerMsg = msg.toLowerCase();
+      const isBlockedNetworkError =
+        lowerMsg.includes("failed to fetch") ||
+        lowerMsg.includes("network") ||
+        lowerMsg.includes("offline") ||
+        lowerMsg.includes("unavailable");
+
+      const userFacingMsg = isBlockedNetworkError
+        ? "Your browser is blocking Firestore requests (often ad blocker/privacy shield). Disable blockers for this site and try again."
+        : msg;
+
       console.error("Save failed:", err);
-      setSaveError(msg);
-      toast({ title: "Save failed", description: msg, variant: "destructive" });
+      setSaveError(userFacingMsg);
+      toast({ title: "Save failed", description: userFacingMsg, variant: "destructive" });
     } finally {
       setSaving(false);
     }
