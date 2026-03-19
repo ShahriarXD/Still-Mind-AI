@@ -165,7 +165,7 @@ export default function LandingPage() {
                 <span className="h-3 w-3 rounded-full bg-green-500/60" />
               </div>
               <div className="flex-1 mx-4 h-6 rounded-md bg-[#111827] border border-[#1e2d40] flex items-center px-3">
-                <span className="text-xs text-slate-500">app.steelmind.ai/dashboard</span>
+                <span className="text-xs text-slate-500">https://still-mind-ai.vercel.app/</span>
               </div>
             </div>
 
@@ -399,7 +399,7 @@ export default function LandingPage() {
             </span>
           </div>
           <p className="text-xs text-slate-600">
-            © 2026 SteelMind AI. Built for small wholesalers worldwide.
+            © 2026 SteelMind AI. Built for small wholesalers worldwide. Made with 💛 by K M SHAHRIAR HOSSAIN.
           </p>
           <div className="flex gap-4">
             <Link href="/login" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Login</Link>

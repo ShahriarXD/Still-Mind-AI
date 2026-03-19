@@ -33,7 +33,11 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) {
+    const normalizedName = form.name.trim();
+    const normalizedEmail = form.email.trim().toLowerCase();
+    const normalizedCompany = form.company.trim();
+
+    if (!normalizedName || !normalizedEmail || !form.password) {
       toast({ title: "Missing fields", description: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
@@ -43,7 +47,7 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await signUp(form.email, form.password, form.name, form.company);
+      await signUp(normalizedEmail, form.password, normalizedName, normalizedCompany);
       toast({ title: "Account created!", description: "Check your email to verify your address." });
       router.push("/verify-email");
     } catch (err: unknown) {
@@ -55,6 +59,16 @@ export default function RegisterPage() {
           ? "Please enter a valid email address."
           : code === "auth/weak-password"
           ? "Password must be at least 6 characters."
+          : code === "auth/operation-not-allowed"
+          ? "Email/password sign-up is disabled in Firebase Auth settings."
+          : code === "auth/unauthorized-domain"
+          ? "This domain is not authorized in Firebase Authentication settings."
+          : code === "auth/invalid-api-key" || code === "auth/app-not-authorized"
+          ? "Firebase configuration is invalid. Please verify environment variables."
+          : code === "auth/network-request-failed"
+          ? "Network error while creating account. Please check your connection and try again."
+          : code === "auth/too-many-requests"
+          ? "Too many attempts. Please wait a moment and try again."
           : "Registration failed. Please try again.";
       toast({ title: "Registration failed", description: msg, variant: "destructive" });
     } finally {
