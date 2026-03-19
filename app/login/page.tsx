@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, missingRequiredFirebaseKeys } from "@/lib/firebase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,9 +24,10 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!isFirebaseConfigured) {
+      const missing = missingRequiredFirebaseKeys.join(", ");
       toast({
         title: "Configuration issue",
-        description: "Firebase env vars are missing on this deployment. Please set NEXT_PUBLIC_FIREBASE_* in Vercel and redeploy.",
+        description: `Missing Firebase env vars in this deployment: ${missing}. Set these in Vercel and redeploy.`,
         variant: "destructive",
       });
       return;

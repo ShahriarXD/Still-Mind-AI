@@ -13,14 +13,23 @@ const firebasePublicEnv = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const missingFirebaseKeys = Object.entries(firebasePublicEnv)
+const requiredFirebasePublicEnv = {
+  apiKey: firebasePublicEnv.apiKey,
+  authDomain: firebasePublicEnv.authDomain,
+  projectId: firebasePublicEnv.projectId,
+  storageBucket: firebasePublicEnv.storageBucket,
+  messagingSenderId: firebasePublicEnv.messagingSenderId,
+  appId: firebasePublicEnv.appId,
+};
+
+export const missingRequiredFirebaseKeys = Object.entries(requiredFirebasePublicEnv)
   .filter(([, value]) => !value)
   .map(([key]) => key);
 
-export const isFirebaseConfigured = missingFirebaseKeys.length === 0;
+export const isFirebaseConfigured = missingRequiredFirebaseKeys.length === 0;
 
 if (!isFirebaseConfigured && typeof window !== "undefined") {
-  console.error("Missing Firebase env vars:", missingFirebaseKeys);
+  console.error("Missing Firebase env vars:", missingRequiredFirebaseKeys);
 }
 
 // Fallback values prevent build errors when .env.local is not present.

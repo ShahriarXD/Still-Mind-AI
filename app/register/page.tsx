@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, missingRequiredFirebaseKeys } from "@/lib/firebase";
 
 const perks = [
   "AI-powered note analysis",
@@ -36,9 +36,10 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (!isFirebaseConfigured) {
+      const missing = missingRequiredFirebaseKeys.join(", ");
       toast({
         title: "Configuration issue",
-        description: "Firebase env vars are missing on this deployment. Please set NEXT_PUBLIC_FIREBASE_* in Vercel and redeploy.",
+        description: `Missing Firebase env vars in this deployment: ${missing}. Set these in Vercel and redeploy.`,
         variant: "destructive",
       });
       return;
@@ -87,8 +88,11 @@ export default function RegisterPage() {
           ? "This domain is not authorized in Firebase Authentication settings."
           : code === "auth/configuration-not-found"
           ? "Firebase Auth is not fully configured for this project."
-          : code === "auth/invalid-api-key" || code === "auth/app-not-authorized"
-          ? "Firebase configuration is invalid. Please verify environment variables."
+          : code === "auth/invalid-api-key" ||
+            code === "auth/api-key-not-valid" ||
+            explicitMessage.toLowerCase().includes("api-key-not-valid") ||
+            code === "auth/app-not-authorized"
+          ? "Firebase API key is invalid in production. Update NEXT_PUBLIC_FIREBASE_API_KEY in Vercel from Firebase Web App config and redeploy."
           : code === "auth/internal-error"
           ? "Firebase returned an internal error. Please retry in a few moments."
           : code === "auth/network-request-failed"
