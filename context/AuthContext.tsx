@@ -68,9 +68,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const snap = await getDoc(doc(db, "users", uid));
       if (snap.exists()) {
         setProfile(snap.data() as UserProfile);
+      } else {
+        // Document doesn't exist — create a default profile
+        const defaultProfile: UserProfile = {
+          name: "",
+          email: "",
+          company: "",
+          phone: "",
+          plan: "free",
+          dailyCount: 0,
+          dailyLimit: 20,
+          notifications: {
+            emailFollowups: true,
+            riskAlerts: true,
+            weeklyReport: false,
+            newFeatures: true,
+          },
+        };
+        setProfile(defaultProfile);
+        // Try to save it for next time (non-blocking)
+        setDoc(doc(db, "users", uid), {
+          ...defaultProfile,
+          createdAt: serverTimestamp(),
+        }).catch(() => {});
       }
-    } catch {
-      // Firestore unavailable or permission denied — app still works without profile
+    } catch (err) {
+      // Firestore unavailable or permission denied — set default profile so app works
+      console.error("Failed to fetch profile:", err);
+      const defaultProfile: UserProfile = {
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        plan: "free",
+        dailyCount: 0,
+        dailyLimit: 20,
+        notifications: {
+          emailFollowups: true,
+          riskAlerts: true,
+          weeklyReport: false,
+          newFeatures: true,
+        },
+      };
+      setProfile(defaultProfile);
     }
   }, []);
 
@@ -84,8 +124,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           document.cookie = `__session=${token}; path=/; max-age=604800; SameSite=Strict`;
         }).catch(() => {});
 
-        // Fetch profile in background — don't block UI
-        fetchProfile(firebaseUser.uid).finally(() => setLoading(false));
+        // Mark auth as loaded immediately — don't wait for profile
+        setLoading(false);
+        // Fetch profile in background (or create default if missing)
+        fetchProfile(firebaseUser.uid);
       } else {
         document.cookie = "__session=; path=/; max-age=0";
         setProfile(null);
