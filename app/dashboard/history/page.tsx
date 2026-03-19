@@ -173,7 +173,9 @@ export default function HistoryPage() {
     const unsub = onSnapshot(
       q,
       (snap) => {
-        const docs = snap.docs.map((d) => {
+        const docs = snap.docs
+          .filter((d) => !d.metadata.hasPendingWrites)
+          .map((d) => {
           const data = d.data();
           const ts = data.createdAt as Timestamp | null;
           return {
@@ -181,7 +183,7 @@ export default function HistoryPage() {
             ...data,
             createdAt: ts ? ts.toDate().toISOString() : new Date().toISOString(),
           } as Interaction;
-        });
+          });
         setInteractions(docs);
         setLoadingData(false);
       },

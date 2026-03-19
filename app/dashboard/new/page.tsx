@@ -168,18 +168,27 @@ export default function NewInteractionPage() {
     setSaveError(null);
     try {
       console.log("Saving interaction for user:", user.uid);
-      await addDoc(collection(db, "users", user.uid, "interactions"), {
-        customerName: form.customerName,
-        phone: form.phone,
-        company: form.company,
-        type: form.type,
-        notes: form.notes,
-        summary: result.summary,
-        risk: result.risk,
-        followUps: result.followUps,
-        draftMessage: result.draftMessage,
-        createdAt: serverTimestamp(),
-      });
+      const saveTimeoutMs = 12000;
+      await Promise.race([
+        addDoc(collection(db, "users", user.uid, "interactions"), {
+          customerName: form.customerName,
+          phone: form.phone,
+          company: form.company,
+          type: form.type,
+          notes: form.notes,
+          summary: result.summary,
+          risk: result.risk,
+          followUps: result.followUps,
+          draftMessage: result.draftMessage,
+          createdAt: serverTimestamp(),
+        }),
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Save request timed out. Firestore may be blocked by your browser.")),
+            saveTimeoutMs
+          )
+        ),
+      ]);
       console.log("Interaction saved successfully");
       setSaved(true);
       toast({ title: "Interaction saved", description: "Added to your history." });

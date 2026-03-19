@@ -63,7 +63,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = useCallback(async (uid: string) => {
+  const fetchProfile = useCallback(async (uid: string, fallback?: { name?: string | null; email?: string | null }) => {
+    const fallbackName = fallback?.name?.trim() || "User";
+    const fallbackEmail = fallback?.email?.trim() || "";
+
     try {
       const snap = await getDoc(doc(db, "users", uid));
       if (snap.exists()) {
@@ -71,8 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         // Document doesn't exist — create a default profile
         const defaultProfile: UserProfile = {
-          name: "",
-          email: "",
+          name: fallbackName,
+          email: fallbackEmail,
           company: "",
           phone: "",
           plan: "free",
@@ -96,8 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Firestore unavailable or permission denied — set default profile so app works
       console.error("Failed to fetch profile:", err);
       const defaultProfile: UserProfile = {
-        name: "",
-        email: "",
+        name: fallbackName,
+        email: fallbackEmail,
         company: "",
         phone: "",
         plan: "free",
@@ -126,8 +129,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Mark auth as loaded immediately — don't wait for profile
         setLoading(false);
+        setProfile((prev) => prev ?? {
+          name: firebaseUser.displayName?.trim() || "User",
+          email: firebaseUser.email || "",
+          company: "",
+          phone: "",
+          plan: "free",
+          dailyCount: 0,
+          dailyLimit: 20,
+          notifications: {
+            emailFollowups: true,
+            riskAlerts: true,
+            weeklyReport: false,
+            newFeatures: true,
+          },
+        });
         // Fetch profile in background (or create default if missing)
-        fetchProfile(firebaseUser.uid);
+        fetchProfile(firebaseUser.uid, {
+          name: firebaseUser.displayName,
+          email: firebaseUser.email,
+        });
       } else {
         document.cookie = "__session=; path=/; max-age=0";
         setProfile(null);
@@ -143,7 +164,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     cred.user.getIdToken().then((token) => {
       document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
     }).catch(() => {});
-    fetchProfile(cred.user.uid);
+    setProfile((prev) => prev ?? {
+      name: cred.user.displayName?.trim() || "User",
+      email: cred.user.email || "",
+      company: "",
+      phone: "",
+      plan: "free",
+      dailyCount: 0,
+      dailyLimit: 20,
+      notifications: {
+        emailFollowups: true,
+        riskAlerts: true,
+        weeklyReport: false,
+        newFeatures: true,
+      },
+    });
+    fetchProfile(cred.user.uid, {
+      name: cred.user.displayName,
+      email: cred.user.email,
+    });
   };
 
   const signUp = async (
