@@ -44,9 +44,10 @@ function ToggleSwitch({
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { profile, updateProfile } = useAuth();
+  const { profile, updateProfile, loading: authLoading } = useAuth();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [profileForm, setProfileForm] = useState({
     name: "",
@@ -63,20 +64,23 @@ export default function SettingsPage() {
 
   // Sync form state when profile loads from Firestore
   useEffect(() => {
-    if (profile) {
-      setProfileForm({
-        name: profile.name || "",
-        company: profile.company || "",
-        phone: profile.phone || "",
-      });
-      setNotifications(profile.notifications || {
-        emailFollowups: true,
-        riskAlerts: true,
-        weeklyReport: false,
-        newFeatures: true,
-      });
+    if (!authLoading) {
+      if (profile) {
+        setProfileForm({
+          name: profile.name || "",
+          company: profile.company || "",
+          phone: profile.phone || "",
+        });
+        setNotifications(profile.notifications || {
+          emailFollowups: true,
+          riskAlerts: true,
+          weeklyReport: false,
+          newFeatures: true,
+        });
+      }
+      setProfileLoading(false);
     }
-  }, [profile]);
+  }, [profile, authLoading]);
 
   const dailyCount = profile?.dailyCount ?? 0;
   const dailyLimit = profile?.dailyLimit ?? 20;
@@ -186,54 +190,66 @@ export default function SettingsPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Full Name</Label>
-                <Input
-                  value={profileForm.name}
-                  onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                />
+            {profileLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
+                <span className="ml-2 text-sm text-slate-400">Loading profile...</span>
               </div>
-              <div className="space-y-1.5">
-                <Label>Company</Label>
-                <Input
-                  value={profileForm.company}
-                  onChange={(e) => setProfileForm({ ...profileForm, company: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Email Address</Label>
-              <Input
-                type="email"
-                value={profile?.email || ""}
-                disabled
-                className="opacity-60 cursor-not-allowed"
-              />
-              <p className="text-xs text-slate-600">Email cannot be changed here.</p>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Phone</Label>
-              <Input
-                value={profileForm.phone}
-                onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-              />
-            </div>
-            <Button onClick={handleSave} className="gap-2" disabled={saving || saved}>
-              {saving ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Saving...
-                </>
-              ) : saved ? (
-                <>
-                  <Check size={16} />
-                  Saved!
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>Full Name</Label>
+                    <Input
+                      value={profileForm.name}
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      disabled={profileLoading}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Company</Label>
+                    <Input
+                      value={profileForm.company}
+                      onChange={(e) => setProfileForm({ ...profileForm, company: e.target.value })}
+                      disabled={profileLoading}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Email Address</Label>
+                  <Input
+                    type="email"
+                    value={profile?.email || ""}
+                    disabled
+                    className="opacity-60 cursor-not-allowed"
+                  />
+                  <p className="text-xs text-slate-600">Email cannot be changed here.</p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Phone</Label>
+                  <Input
+                    value={profileForm.phone}
+                    onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                    disabled={profileLoading}
+                  />
+                </div>
+                <Button onClick={handleSave} className="gap-2" disabled={saving || saved || profileLoading}>
+                  {saving ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
+                    </>
+                  ) : saved ? (
+                    <>
+                      <Check size={16} />
+                      Saved!
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
 

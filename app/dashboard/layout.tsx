@@ -18,9 +18,8 @@ export default function DashboardLayout({
     if (loading) return;
     if (!user) {
       router.replace("/login");
-    } else if (!user.emailVerified) {
-      router.replace("/verify-email");
     }
+    // Email verification is optional for now — allow access
   }, [user, loading, router]);
 
   if (loading) {
@@ -31,7 +30,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (!user || !user.emailVerified) return null;
+  if (!user) return null;
 
   return (
     <div className="flex h-screen bg-[#0f172a]">

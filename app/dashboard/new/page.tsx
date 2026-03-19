@@ -173,11 +173,15 @@ export default function NewInteractionPage() {
         createdAt: serverTimestamp(),
       });
       setSaved(true);
-      toast({ title: "Interaction saved", description: "Added to your history.", variant: "success" });
+      toast({ title: "Interaction saved", description: "Added to your history." });
+      // Reset form and results after successful save
+      setTimeout(() => {
+        handleReset();
+      }, 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not save interaction.";
       setSaveError(msg);
-      toast({ title: "Save failed", description: "Could not save interaction.", variant: "destructive" });
+      toast({ title: "Save failed", description: msg, variant: "destructive" });
     } finally {
       setSaving(false);
     }

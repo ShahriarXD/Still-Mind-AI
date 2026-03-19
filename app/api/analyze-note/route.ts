@@ -127,9 +127,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
     const risk = detectRisk(note, type);
     const summary = generateSummary(customerName, note, type);
     const followUps = generateFollowUps(risk, type);

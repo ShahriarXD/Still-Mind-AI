@@ -99,8 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cred = await signInWithEmailAndPassword(auth, email, password);
     const token = await cred.user.getIdToken();
     document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
-    // Fetch profile in background — don't block sign-in
-    fetchProfile(cred.user.uid);
+    // Fetch profile and wait for it to complete
+    await fetchProfile(cred.user.uid);
   };
 
   const signUp = async (
