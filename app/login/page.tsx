@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +22,16 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isFirebaseConfigured) {
+      toast({
+        title: "Configuration issue",
+        description: "Firebase env vars are missing on this deployment. Please set NEXT_PUBLIC_FIREBASE_* in Vercel and redeploy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!form.email || !form.password) {
       toast({ title: "Missing fields", description: "Please fill in all fields.", variant: "destructive" });
       return;

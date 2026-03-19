@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 const perks = [
   "AI-powered note analysis",
@@ -33,6 +34,16 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isFirebaseConfigured) {
+      toast({
+        title: "Configuration issue",
+        description: "Firebase env vars are missing on this deployment. Please set NEXT_PUBLIC_FIREBASE_* in Vercel and redeploy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const normalizedName = form.name.trim();
     const normalizedEmail = form.email.trim().toLowerCase();
     const normalizedCompany = form.company.trim();
@@ -84,7 +95,7 @@ export default function RegisterPage() {
           ? "Network error while creating account. Please check your connection and try again."
           : code === "auth/too-many-requests"
           ? "Too many attempts. Please wait a moment and try again."
-          : `Registration failed${code ? ` (${code})` : ""}. Please try again.`;
+          : `Registration failed${code ? ` (${code})` : ""}${explicitMessage ? `: ${explicitMessage}` : ". Please try again."}`;
       toast({ title: "Registration failed", description: msg, variant: "destructive" });
     } finally {
       setLoading(false);
