@@ -237,8 +237,14 @@ export default function NewInteractionPage() {
           });
 
           if (!fallbackRes.ok) {
-            const fallbackData = (await fallbackRes.json().catch(() => ({}))) as { error?: string };
-            throw new Error(fallbackData.error || "Fallback save failed.");
+            const fallbackData = (await fallbackRes.json().catch(() => ({}))) as {
+              error?: string;
+              details?: string;
+              status?: number;
+            };
+            const detailText = fallbackData.details ? ` ${fallbackData.details}` : "";
+            const statusText = fallbackData.status ? ` (status ${fallbackData.status})` : "";
+            throw new Error(`${fallbackData.error || "Fallback save failed."}${statusText}.${detailText}`);
           }
 
           console.log("Interaction saved through API fallback");

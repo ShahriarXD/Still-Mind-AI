@@ -76,7 +76,11 @@ export async function POST(req: NextRequest) {
       decodeProjectIdFromIdToken(idToken) ||
       "simple-prac-72cd7";
 
-    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/${uid}/interactions`;
+    const apiKey =
+      process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+      "AIzaSyCcovDbWew5iwahusJ7B0v7yqkreh_h-RE";
+
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/${uid}/interactions?key=${encodeURIComponent(apiKey)}`;
 
     const fields = {
       customerName: { stringValue: interaction.customerName || "" },
@@ -107,13 +111,19 @@ export async function POST(req: NextRequest) {
     if (!firestoreRes.ok) {
       const errorText = await firestoreRes.text();
       return NextResponse.json(
-        { error: "Firestore write failed", details: errorText },
+        {
+          error: "Firestore write failed",
+          status: firestoreRes.status,
+          details: errorText,
+          projectId,
+        },
         { status: firestoreRes.status }
       );
     }
 
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to save interaction." }, { status: 500 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to save interaction.";
+    return NextResponse.json({ error: "Failed to save interaction.", details: message }, { status: 500 });
   }
 }
