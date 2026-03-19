@@ -92,6 +92,7 @@ export default function NewInteractionPage() {
   const [result, setResult] = useState<AnalyzeNoteResponse | null>(null);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     customerName: "",
@@ -157,6 +158,7 @@ export default function NewInteractionPage() {
   const handleSave = async () => {
     if (!result || !user) return;
     setSaving(true);
+    setSaveError(null);
     try {
       await addDoc(collection(db, "users", user.uid, "interactions"), {
         customerName: form.customerName,
@@ -172,7 +174,9 @@ export default function NewInteractionPage() {
       });
       setSaved(true);
       toast({ title: "Interaction saved", description: "Added to your history.", variant: "success" });
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not save interaction.";
+      setSaveError(msg);
       toast({ title: "Save failed", description: "Could not save interaction.", variant: "destructive" });
     } finally {
       setSaving(false);
@@ -183,6 +187,7 @@ export default function NewInteractionPage() {
     setForm({ customerName: "", phone: "", company: "", type: "", notes: "" });
     setResult(null);
     setSaved(false);
+    setSaveError(null);
   };
 
   return (
@@ -404,6 +409,13 @@ export default function NewInteractionPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Save error */}
+                {saveError && (
+                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+                    <span className="font-medium">Save failed:</span> {saveError}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-3">

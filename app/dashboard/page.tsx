@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
       <div className="p-6 space-y-6 animate-fade-in">
         {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 via-[#111827] to-[#111827] p-5">
+        <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-linear-to-r from-amber-500/10 via-[#111827] to-[#111827] p-5">
           <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-10">
             <Zap className="h-20 w-20 text-amber-500" />
           </div>

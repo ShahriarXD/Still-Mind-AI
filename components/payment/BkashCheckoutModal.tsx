@@ -241,7 +241,7 @@ export function BkashCheckoutModal({
               )}
 
               {/* Simulated bKash PIN UI */}
-              <div className="rounded-xl border border-[#e2136e]/30 bg-gradient-to-br from-[#e2136e]/5 to-transparent p-5">
+              <div className="rounded-xl border border-[#e2136e]/30 bg-linear-to-br from-[#e2136e]/5 to-transparent p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e2136e] text-white font-bold text-xs">
                     bK

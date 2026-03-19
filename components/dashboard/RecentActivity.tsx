@@ -57,7 +57,7 @@ export function RecentActivity({ interactions }: RecentActivityProps) {
             style={{ animationDelay: `${index * 50}ms` }}
           >
             {/* Avatar */}
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-slate-700 to-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
               {interaction.customerName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
             </div>
 

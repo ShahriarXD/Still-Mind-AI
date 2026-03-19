@@ -102,15 +102,20 @@ export default function LandingPage() {
         <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-48 left-1/4 w-[300px] h-[300px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
+        {/* 3D floating orbs */}
+        <div className="absolute top-36 right-[8%] w-24 h-24 rounded-full bg-amber-500/8 border border-amber-500/15 blur-sm animate-orbit-3d pointer-events-none hidden lg:block" style={{ animationDelay: "0s" }} />
+        <div className="absolute top-64 left-[6%] w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/15 blur-sm animate-orbit-3d pointer-events-none hidden lg:block" style={{ animationDelay: "-4s" }} />
+        <div className="absolute bottom-24 right-[12%] w-10 h-10 rounded-full bg-green-500/10 border border-green-500/15 blur-sm animate-orbit-3d pointer-events-none hidden lg:block" style={{ animationDelay: "-8s" }} />
+
         <div className="relative max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-1.5 text-xs font-medium text-amber-400 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-1.5 text-xs font-medium text-amber-400 mb-8 animate-float-3d">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
             AI-Powered Wholesale Management
           </div>
 
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-slate-100 mb-6 leading-[1.1]">
             AI Assistant for{" "}
-            <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-amber-400 via-amber-500 to-orange-500 bg-clip-text text-transparent">
               Small Wholesalers
             </span>
           </h1>
@@ -150,7 +155,8 @@ export default function LandingPage() {
       {/* Mock Dashboard Preview */}
       <section className="px-6 pb-24">
         <div className="max-w-5xl mx-auto">
-          <div className="relative rounded-2xl border border-[#1e2d40] bg-[#111827] overflow-hidden shadow-2xl">
+          <div className="animate-card-float-3d">
+          <div className="relative rounded-2xl border border-[#1e2d40] bg-[#111827] overflow-hidden shadow-2xl shadow-black/40">
             {/* Mock browser bar */}
             <div className="flex items-center gap-2 px-4 py-3 bg-[#0a1020] border-b border-[#1e2d40]">
               <div className="flex gap-1.5">
@@ -228,7 +234,8 @@ export default function LandingPage() {
             </div>
 
             {/* Gradient overlay at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#111827] to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-[#111827] to-transparent pointer-events-none" />
+          </div>
           </div>
         </div>
       </section>
@@ -250,7 +257,7 @@ export default function LandingPage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className={`relative rounded-2xl border ${feature.border} bg-gradient-to-br ${feature.gradient} p-6 group hover:scale-[1.02] transition-all duration-300`}
+                className={`card-3d relative rounded-2xl border ${feature.border} bg-linear-to-br ${feature.gradient} p-6`}
               >
                 <div
                   className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${feature.iconBg} mb-5`}
@@ -354,8 +361,8 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="px-6 pb-24">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="relative rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-[#111827] to-[#111827] p-12">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
+          <div className="relative rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/10 via-[#111827] to-[#111827] p-12">
+            <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-amber-500/5 to-transparent pointer-events-none" />
             <Zap className="h-10 w-10 text-amber-500 mx-auto mb-5" />
             <h2 className="text-3xl font-bold text-slate-100 mb-4">
               Ready to get smarter about your customers?

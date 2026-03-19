@@ -62,3 +62,64 @@ body {
 .animate-slide-up {
   animation: slideUp 0.4s ease-out;
 }
+
+/* 3D floating animation */
+@keyframes float3d {
+  0%   { transform: perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0px); }
+  25%  { transform: perspective(800px) rotateX(2deg) rotateY(-3deg) translateY(-8px); }
+  50%  { transform: perspective(800px) rotateX(-1deg) rotateY(3deg) translateY(-14px); }
+  75%  { transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-6px); }
+  100% { transform: perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0px); }
+}
+
+/* 3D slow orbit for decorative spheres */
+@keyframes orbit3d {
+  0%   { transform: perspective(600px) rotateY(0deg) rotateX(15deg) translateZ(0px); }
+  50%  { transform: perspective(600px) rotateY(180deg) rotateX(-15deg) translateZ(20px); }
+  100% { transform: perspective(600px) rotateY(360deg) rotateX(15deg) translateZ(0px); }
+}
+
+/* 3D card tilt + float combo */
+@keyframes cardFloat3d {
+  0%   { transform: perspective(1000px) rotateX(6deg) rotateY(-4deg) translateY(0px) scale(1); }
+  33%  { transform: perspective(1000px) rotateX(3deg) rotateY(4deg) translateY(-10px) scale(1.01); }
+  66%  { transform: perspective(1000px) rotateX(-4deg) rotateY(-2deg) translateY(-6px) scale(1.005); }
+  100% { transform: perspective(1000px) rotateX(6deg) rotateY(-4deg) translateY(0px) scale(1); }
+}
+
+/* Gentle 3D pulse for hero icon */
+@keyframes pulse3d {
+  0%   { transform: perspective(400px) rotateY(0deg) scale(1); }
+  50%  { transform: perspective(400px) rotateY(20deg) scale(1.08); }
+  100% { transform: perspective(400px) rotateY(0deg) scale(1); }
+}
+
+.animate-float-3d {
+  animation: float3d 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-card-float-3d {
+  animation: cardFloat3d 8s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-orbit-3d {
+  animation: orbit3d 12s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-pulse-3d {
+  animation: pulse3d 4s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* Feature card 3D hover — needs group-hover in Tailwind or a CSS class */
+.card-3d {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transform-style: preserve-3d;
+}
+.card-3d:hover {
+  transform: perspective(600px) rotateX(-4deg) rotateY(6deg) translateY(-6px) scale(1.03);
+  box-shadow: 0 24px 40px -8px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.1);
+}

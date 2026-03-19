@@ -89,7 +89,7 @@ export function Sidebar() {
       {/* Footer */}
       <div className="border-t border-[#1e2d40] p-3 space-y-1">
         <div className="flex items-center gap-3 rounded-xl px-3 py-2.5">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-xs font-bold text-slate-900 shrink-0">
+          <div className="h-8 w-8 rounded-full bg-linear-to-br from-amber-500 to-amber-600 flex items-center justify-center text-xs font-bold text-slate-900 shrink-0">
             {initials}
           </div>
           <div className="flex-1 min-w-0">

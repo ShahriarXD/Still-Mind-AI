@@ -73,7 +73,7 @@ function InteractionDetailDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 text-sm font-semibold text-slate-200">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-slate-700 to-slate-800 border border-slate-600 text-sm font-semibold text-slate-200">
               {interaction.customerName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
             </div>
             <div className="flex-1 min-w-0">

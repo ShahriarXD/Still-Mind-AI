@@ -78,9 +78,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        // Don't block loading on Firestore — fetch profile in background
+        // Refresh session cookie whenever Firebase renews the token (~every hour)
+        // Set 7-day expiry so the proxy doesn't force re-login before Firebase does
+        firebaseUser.getIdToken().then((token) => {
+          document.cookie = `__session=${token}; path=/; max-age=604800; SameSite=Strict`;
+        }).catch(() => {});
+
+        // Fetch profile in background — don't block UI
         fetchProfile(firebaseUser.uid).finally(() => setLoading(false));
       } else {
+        document.cookie = "__session=; path=/; max-age=0";
         setProfile(null);
         setLoading(false);
       }
