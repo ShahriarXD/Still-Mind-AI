@@ -118,6 +118,9 @@ export async function POST(req: NextRequest) {
       const isDatabaseMissing =
         lower.includes("database (default) does not exist") ||
         lower.includes("please visit https://console.cloud.google.com/datastore/setup");
+      const isPermissionDenied =
+        lower.includes("missing or insufficient permissions") ||
+        lower.includes("permission_denied");
 
       if (firestoreRes.status === 403 && isServiceDisabled) {
         const activationUrl = `https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=${projectId}`;
@@ -141,6 +144,20 @@ export async function POST(req: NextRequest) {
             code: "FIRESTORE_DATABASE_MISSING",
             status: firestoreRes.status,
             setupUrl,
+            projectId,
+          },
+          { status: firestoreRes.status }
+        );
+      }
+
+      if (firestoreRes.status === 403 && isPermissionDenied) {
+        const rulesUrl = `https://console.firebase.google.com/project/${projectId}/firestore/rules`;
+        return NextResponse.json(
+          {
+            error: "Firestore rules are denying this write.",
+            code: "FIRESTORE_PERMISSION_DENIED",
+            status: firestoreRes.status,
+            rulesUrl,
             projectId,
           },
           { status: firestoreRes.status }

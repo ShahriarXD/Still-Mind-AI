@@ -216,6 +216,10 @@ export default function NewInteractionPage() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not save interaction.";
       const lowerMsg = msg.toLowerCase();
+      const isPermissionError =
+        lowerMsg.includes("missing or insufficient permissions") ||
+        lowerMsg.includes("permission-denied") ||
+        lowerMsg.includes("permission denied");
       const isBlockedNetworkError =
         lowerMsg.includes("failed to fetch") ||
         lowerMsg.includes("network") ||
@@ -244,6 +248,7 @@ export default function NewInteractionPage() {
               status?: number;
               activationUrl?: string;
               setupUrl?: string;
+              rulesUrl?: string;
             };
 
             if (fallbackData.code === "FIRESTORE_API_DISABLED") {
@@ -255,6 +260,12 @@ export default function NewInteractionPage() {
             if (fallbackData.code === "FIRESTORE_DATABASE_MISSING") {
               throw new Error(
                 `Cloud Firestore database is not created yet. Open this link, create the database, wait 1-2 minutes, then retry: ${fallbackData.setupUrl || ""}`.trim()
+              );
+            }
+
+            if (fallbackData.code === "FIRESTORE_PERMISSION_DENIED") {
+              throw new Error(
+                `Firestore security rules are blocking writes. Publish rules for users/{uid}/interactions and retry: ${fallbackData.rulesUrl || ""}`.trim()
               );
             }
 
@@ -273,6 +284,15 @@ export default function NewInteractionPage() {
           toast({ title: "Save failed", description: fallbackMsg, variant: "destructive" });
           return;
         }
+      }
+
+      if (isPermissionError) {
+        const permissionMsg =
+          "Firestore rules are blocking this save. In Firebase Console, publish rules that allow authenticated users to read/write only their own users/{uid} and users/{uid}/interactions documents.";
+        console.error("Save failed:", err);
+        setSaveError(permissionMsg);
+        toast({ title: "Save failed", description: permissionMsg, variant: "destructive" });
+        return;
       }
 
       const userFacingMsg = isBlockedNetworkError
