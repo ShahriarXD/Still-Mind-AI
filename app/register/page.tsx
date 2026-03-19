@@ -44,8 +44,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await signUp(form.email, form.password, form.name, form.company);
-      toast({ title: "Account created!", description: "Welcome to SteelMind AI." });
-      router.push("/dashboard");
+      toast({ title: "Account created!", description: "Check your email to verify your address." });
+      router.push("/verify-email");
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
       const msg =

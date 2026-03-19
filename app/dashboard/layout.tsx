@@ -15,8 +15,11 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!user) {
       router.replace("/login");
+    } else if (!user.emailVerified) {
+      router.replace("/verify-email");
     }
   }, [user, loading, router]);
 
@@ -28,7 +31,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (!user) return null;
+  if (!user || !user.emailVerified) return null;
 
   return (
     <div className="flex h-screen bg-[#0f172a]">

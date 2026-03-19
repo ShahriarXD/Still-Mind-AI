@@ -249,7 +249,7 @@ export default function BillingPage() {
           open={checkoutOpen}
           planId={selectedPlan}
           onSuccess={handlePaymentSuccess}
-          onFailure={handlePaymentFailure}
+
           onClose={() => setCheckoutOpen(false)}
         />
       )}
