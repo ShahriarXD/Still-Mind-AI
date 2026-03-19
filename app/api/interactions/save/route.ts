@@ -34,6 +34,29 @@ function decodeUidFromIdToken(idToken: string): string | null {
   }
 }
 
+function decodeProjectIdFromIdToken(idToken: string): string | null {
+  try {
+    const parts = idToken.split(".");
+    if (parts.length !== 3) return null;
+
+    const payloadPart = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = payloadPart.padEnd(payloadPart.length + ((4 - (payloadPart.length % 4)) % 4), "=");
+    const payload = JSON.parse(Buffer.from(padded, "base64").toString("utf8")) as {
+      aud?: string;
+      iss?: string;
+    };
+
+    if (payload.aud) return payload.aud;
+    if (payload.iss?.includes("https://securetoken.google.com/")) {
+      return payload.iss.split("https://securetoken.google.com/")[1] || null;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as SaveInteractionBody;
@@ -48,10 +71,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid authentication token." }, { status: 401 });
     }
 
-    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-    if (!projectId) {
-      return NextResponse.json({ error: "Firebase project is not configured on server." }, { status: 500 });
-    }
+    const projectId =
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+      decodeProjectIdFromIdToken(idToken) ||
+      "simple-prac-72cd7";
 
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/${uid}/interactions`;
 
