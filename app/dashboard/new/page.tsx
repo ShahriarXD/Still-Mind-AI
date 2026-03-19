@@ -243,11 +243,18 @@ export default function NewInteractionPage() {
               details?: string;
               status?: number;
               activationUrl?: string;
+              setupUrl?: string;
             };
 
             if (fallbackData.code === "FIRESTORE_API_DISABLED") {
               throw new Error(
                 `Cloud Firestore API is disabled for this project. Enable it in Google Cloud Console and retry. ${fallbackData.activationUrl || ""}`.trim()
+              );
+            }
+
+            if (fallbackData.code === "FIRESTORE_DATABASE_MISSING") {
+              throw new Error(
+                `Cloud Firestore database is not created yet. Open this link, create the database, wait 1-2 minutes, then retry: ${fallbackData.setupUrl || ""}`.trim()
               );
             }
 

@@ -115,6 +115,9 @@ export async function POST(req: NextRequest) {
         lower.includes("service_disabled") ||
         lower.includes("cloud firestore api has not been used") ||
         lower.includes("firestore.googleapis.com");
+      const isDatabaseMissing =
+        lower.includes("database (default) does not exist") ||
+        lower.includes("please visit https://console.cloud.google.com/datastore/setup");
 
       if (firestoreRes.status === 403 && isServiceDisabled) {
         const activationUrl = `https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=${projectId}`;
@@ -124,6 +127,20 @@ export async function POST(req: NextRequest) {
             code: "FIRESTORE_API_DISABLED",
             status: firestoreRes.status,
             activationUrl,
+            projectId,
+          },
+          { status: firestoreRes.status }
+        );
+      }
+
+      if (firestoreRes.status === 404 && isDatabaseMissing) {
+        const setupUrl = `https://console.cloud.google.com/datastore/setup?project=${projectId}`;
+        return NextResponse.json(
+          {
+            error: "Cloud Firestore database is not created for this project.",
+            code: "FIRESTORE_DATABASE_MISSING",
+            status: firestoreRes.status,
+            setupUrl,
             projectId,
           },
           { status: firestoreRes.status }
