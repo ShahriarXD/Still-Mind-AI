@@ -184,7 +184,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) file for 
 
 ## 👨‍💻 Author
 
-**Developed with ❤️ for small wholesale businesses**
+**Developed with ❤️ by K M SHAHRIAR HOSSAIN**
 
 Interested in contributing? Fork the repo and submit a pull request!
 
@@ -197,7 +197,6 @@ If SteelMind AI helps your business, please:
 - ⭐ **Star this repo** on GitHub
 - 💬 **Share feedback** – open an issue or discussion
 - 🐛 **Report bugs** – create a detailed issue
-- 📧 **Reach out** – contact us at support@steelmindai.com
 
 ---
 
