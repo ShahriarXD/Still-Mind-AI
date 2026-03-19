@@ -110,9 +110,30 @@ export async function POST(req: NextRequest) {
 
     if (!firestoreRes.ok) {
       const errorText = await firestoreRes.text();
+      const lower = errorText.toLowerCase();
+      const isServiceDisabled =
+        lower.includes("service_disabled") ||
+        lower.includes("cloud firestore api has not been used") ||
+        lower.includes("firestore.googleapis.com");
+
+      if (firestoreRes.status === 403 && isServiceDisabled) {
+        const activationUrl = `https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=${projectId}`;
+        return NextResponse.json(
+          {
+            error: "Cloud Firestore API is disabled for this Firebase project.",
+            code: "FIRESTORE_API_DISABLED",
+            status: firestoreRes.status,
+            activationUrl,
+            projectId,
+          },
+          { status: firestoreRes.status }
+        );
+      }
+
       return NextResponse.json(
         {
           error: "Firestore write failed",
+          code: "FIRESTORE_WRITE_FAILED",
           status: firestoreRes.status,
           details: errorText,
           projectId,

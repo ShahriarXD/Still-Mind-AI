@@ -239,9 +239,18 @@ export default function NewInteractionPage() {
           if (!fallbackRes.ok) {
             const fallbackData = (await fallbackRes.json().catch(() => ({}))) as {
               error?: string;
+              code?: string;
               details?: string;
               status?: number;
+              activationUrl?: string;
             };
+
+            if (fallbackData.code === "FIRESTORE_API_DISABLED") {
+              throw new Error(
+                `Cloud Firestore API is disabled for this project. Enable it in Google Cloud Console and retry. ${fallbackData.activationUrl || ""}`.trim()
+              );
+            }
+
             const detailText = fallbackData.details ? ` ${fallbackData.details}` : "";
             const statusText = fallbackData.status ? ` (status ${fallbackData.status})` : "";
             throw new Error(`${fallbackData.error || "Fallback save failed."}${statusText}.${detailText}`);
