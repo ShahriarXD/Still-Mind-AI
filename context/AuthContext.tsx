@@ -139,9 +139,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const cred = await signInWithEmailAndPassword(auth, email, password);
-    const token = await cred.user.getIdToken();
-    document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
-    // Fetch profile in background — don't block sign-in
+    // Set token and fetch profile in background — don't block sign-in
+    cred.user.getIdToken().then((token) => {
+      document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+    }).catch(() => {});
     fetchProfile(cred.user.uid);
   };
 
@@ -152,8 +153,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     company: string
   ) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const token = await cred.user.getIdToken();
-    document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+    // Set token in background
+    cred.user.getIdToken().then((token) => {
+      document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Strict`;
+    }).catch(() => {});
 
     const newProfile: UserProfile = {
       name,
