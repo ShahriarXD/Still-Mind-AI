@@ -32,6 +32,8 @@ import {
   orderBy,
   onSnapshot,
   Timestamp,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 import { formatDate, formatRelativeDate } from "@/lib/utils";
 import type { Interaction, RiskLevel } from "@/lib/types";
@@ -159,10 +161,34 @@ export default function HistoryPage() {
   const { user } = useAuth();
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [riskFilter, setRiskFilter] = useState<RiskFilter>("ALL");
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [dialogInteraction, setDialogInteraction] = useState<Interaction | null>(null);
+
+  const handleDeleteInteraction = async (interactionId: string) => {
+    if (!user) {
+      toast({ title: "Not authenticated", description: "Please sign in again.", variant: "destructive" });
+      return;
+    }
+
+    const confirmed = window.confirm("Delete this interaction permanently?");
+    if (!confirmed) return;
+
+    setDeletingId(interactionId);
+    try {
+      await deleteDoc(doc(db, "users", user.uid, "interactions", interactionId));
+      toast({ title: "Interaction deleted", description: "The interaction was removed." });
+      setExpandedRow((prev) => (prev === interactionId ? null : prev));
+      setDialogInteraction((prev) => (prev?.id === interactionId ? null : prev));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not delete interaction.";
+      toast({ title: "Delete failed", description: msg, variant: "destructive" });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -348,6 +374,18 @@ export default function HistoryPage() {
                                 >
                                   <MessageSquare size={12} />
                                   View
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 text-xs text-red-400 hover:text-red-300"
+                                  disabled={deletingId === interaction.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    void handleDeleteInteraction(interaction.id);
+                                  }}
+                                >
+                                  {deletingId === interaction.id ? "Deleting..." : "Delete"}
                                 </Button>
                                 <button className="text-slate-500 hover:text-slate-300 transition-colors">
                                   {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
