@@ -51,7 +51,18 @@ export default function RegisterPage() {
       toast({ title: "Account created!", description: "Check your email to verify your address." });
       router.push("/verify-email");
     } catch (err: unknown) {
-      const code = (err as { code?: string }).code;
+      const explicitCode = (err as { code?: string }).code;
+      const explicitMessage = (err as { message?: string }).message ?? "";
+      const codeFromMessage = explicitMessage.match(/auth\/[a-z-]+/)?.[0];
+      const code = explicitCode ?? codeFromMessage;
+
+      // Keep a console trail in production to quickly diagnose Vercel/Firebase setup errors.
+      console.error("Registration error:", {
+        code,
+        message: explicitMessage,
+        raw: err,
+      });
+
       const msg =
         code === "auth/email-already-in-use"
           ? "An account with this email already exists."
@@ -63,13 +74,17 @@ export default function RegisterPage() {
           ? "Email/password sign-up is disabled in Firebase Auth settings."
           : code === "auth/unauthorized-domain"
           ? "This domain is not authorized in Firebase Authentication settings."
+          : code === "auth/configuration-not-found"
+          ? "Firebase Auth is not fully configured for this project."
           : code === "auth/invalid-api-key" || code === "auth/app-not-authorized"
           ? "Firebase configuration is invalid. Please verify environment variables."
+          : code === "auth/internal-error"
+          ? "Firebase returned an internal error. Please retry in a few moments."
           : code === "auth/network-request-failed"
           ? "Network error while creating account. Please check your connection and try again."
           : code === "auth/too-many-requests"
           ? "Too many attempts. Please wait a moment and try again."
-          : "Registration failed. Please try again.";
+          : `Registration failed${code ? ` (${code})` : ""}. Please try again.`;
       toast({ title: "Registration failed", description: msg, variant: "destructive" });
     } finally {
       setLoading(false);
