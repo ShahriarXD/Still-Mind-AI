@@ -156,10 +156,18 @@ export default function NewInteractionPage() {
   };
 
   const handleSave = async () => {
-    if (!result || !user) return;
+    if (!result) {
+      toast({ title: "No data to save", description: "Please analyze an interaction first.", variant: "destructive" });
+      return;
+    }
+    if (!user) {
+      toast({ title: "Not authenticated", description: "Please log in to save interactions.", variant: "destructive" });
+      return;
+    }
     setSaving(true);
     setSaveError(null);
     try {
+      console.log("Saving interaction for user:", user.uid);
       await addDoc(collection(db, "users", user.uid, "interactions"), {
         customerName: form.customerName,
         phone: form.phone,
@@ -172,6 +180,7 @@ export default function NewInteractionPage() {
         draftMessage: result.draftMessage,
         createdAt: serverTimestamp(),
       });
+      console.log("Interaction saved successfully");
       setSaved(true);
       toast({ title: "Interaction saved", description: "Added to your history." });
       // Reset form and results after successful save
@@ -180,6 +189,7 @@ export default function NewInteractionPage() {
       }, 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not save interaction.";
+      console.error("Save failed:", err);
       setSaveError(msg);
       toast({ title: "Save failed", description: msg, variant: "destructive" });
     } finally {
