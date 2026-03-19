@@ -166,20 +166,42 @@ export default function NewInteractionPage() {
     }
     setSaving(true);
     setSaveError(null);
+
+    const interactionPayload = {
+      customerName: form.customerName,
+      phone: form.phone,
+      company: form.company,
+      type: form.type,
+      notes: form.notes,
+      summary: result.summary,
+      risk: result.risk,
+      followUps: result.followUps,
+      draftMessage: result.draftMessage,
+      createdAt: new Date().toISOString(),
+    };
+
+    const onSaveSuccess = () => {
+      setSaved(true);
+      toast({ title: "Interaction saved", description: "Added to your history." });
+      setTimeout(() => {
+        handleReset();
+      }, 1500);
+    };
+
     try {
       console.log("Saving interaction for user:", user.uid);
       const saveTimeoutMs = 12000;
       await Promise.race([
         addDoc(collection(db, "users", user.uid, "interactions"), {
-          customerName: form.customerName,
-          phone: form.phone,
-          company: form.company,
-          type: form.type,
-          notes: form.notes,
-          summary: result.summary,
-          risk: result.risk,
-          followUps: result.followUps,
-          draftMessage: result.draftMessage,
+          customerName: interactionPayload.customerName,
+          phone: interactionPayload.phone,
+          company: interactionPayload.company,
+          type: interactionPayload.type,
+          notes: interactionPayload.notes,
+          summary: interactionPayload.summary,
+          risk: interactionPayload.risk,
+          followUps: interactionPayload.followUps,
+          draftMessage: interactionPayload.draftMessage,
           createdAt: serverTimestamp(),
         }),
         new Promise((_, reject) =>
@@ -190,12 +212,7 @@ export default function NewInteractionPage() {
         ),
       ]);
       console.log("Interaction saved successfully");
-      setSaved(true);
-      toast({ title: "Interaction saved", description: "Added to your history." });
-      // Reset form and results after successful save
-      setTimeout(() => {
-        handleReset();
-      }, 1500);
+      onSaveSuccess();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not save interaction.";
       const lowerMsg = msg.toLowerCase();
@@ -203,7 +220,38 @@ export default function NewInteractionPage() {
         lowerMsg.includes("failed to fetch") ||
         lowerMsg.includes("network") ||
         lowerMsg.includes("offline") ||
-        lowerMsg.includes("unavailable");
+        lowerMsg.includes("unavailable") ||
+        lowerMsg.includes("timed out") ||
+        lowerMsg.includes("blocked");
+
+      if (isBlockedNetworkError) {
+        try {
+          const idToken = await user.getIdToken();
+          const fallbackRes = await fetch("/api/interactions/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              idToken,
+              interaction: interactionPayload,
+            }),
+          });
+
+          if (!fallbackRes.ok) {
+            const fallbackData = (await fallbackRes.json().catch(() => ({}))) as { error?: string };
+            throw new Error(fallbackData.error || "Fallback save failed.");
+          }
+
+          console.log("Interaction saved through API fallback");
+          onSaveSuccess();
+          return;
+        } catch (fallbackErr) {
+          const fallbackMsg = fallbackErr instanceof Error ? fallbackErr.message : "Fallback save failed.";
+          console.error("Fallback save failed:", fallbackErr);
+          setSaveError(fallbackMsg);
+          toast({ title: "Save failed", description: fallbackMsg, variant: "destructive" });
+          return;
+        }
+      }
 
       const userFacingMsg = isBlockedNetworkError
         ? "Your browser is blocking Firestore requests (often ad blocker/privacy shield). Disable blockers for this site and try again."
